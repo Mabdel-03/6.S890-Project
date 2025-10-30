@@ -1,0 +1,133 @@
+# Configuration for Echo(I) - Hierarchical Organizational Influence Propagation
+
+# Data configuration
+data:
+  # Dataset paths
+  data_dir: "data/raw"
+  processed_dir: "data/processed"
+  synthetic_dir: "data/synthetic"
+  real_cases_dir: "data/real_cases"
+  abm_dir: "data/abm_simulations"
+  
+  # Dataset splits (70/15/15)
+  train_split: 0.70
+  val_split: 0.15
+  test_split: 0.15
+  
+  # Data generation
+  num_organizations: 10000
+  recommendations_per_org: 75
+  max_agents: 500
+  max_seq_length: 512
+  
+  # DataLoader
+  batch_size: 32
+  num_workers: 4
+  pin_memory: true
+
+# Model configuration - H-POSG
+model:
+  name: "h_posg"
+  
+  # Dual encoder (text)
+  text_model_name: "roberta-large"  # or "bert-large-uncased"
+  text_embed_dim: 768
+  freeze_text_encoder: false
+  contrastive_temperature: 0.07
+  
+  # GAT (influence propagation)
+  gnn_hidden_dim: 256
+  gnn_num_layers: 4
+  gnn_num_heads: 8
+  gnn_num_timesteps: 3
+  gnn_dropout: 0.2
+  
+  # Hierarchical policy network
+  policy_hidden_dim: 256
+  policy_num_layers: 3
+  agent_feature_dim: 4
+  num_response_classes: 5  # strongly oppose, oppose, neutral, support, strongly support
+  use_hierarchical_attention: false
+  
+  # General
+  dropout: 0.2
+
+# Representation learning configuration
+representation:
+  contrastive_loss: "infonce"  # "infonce", "triplet", "supcon"
+  use_hard_negatives: true
+  num_negatives: 8
+
+# Training configuration
+training:
+  # Optimization
+  epochs: 50
+  learning_rate: 0.0001  # 1e-4
+  optimizer: "adamw"
+  weight_decay: 0.00001  # 1e-5
+  scheduler: "cosine"
+  warmup_steps: 5000
+  grad_clip: 1.0
+  
+  # Multi-objective loss weights
+  lambda_consistency: 0.1
+  lambda_equilibrium: 0.05
+  
+  # Mixed precision
+  use_amp: true
+  
+  # Distributed training
+  distributed: false
+  world_size: 4
+
+# Evaluation configuration
+evaluation:
+  # Metrics
+  metrics:
+    - "accuracy"
+    - "macro_f1"
+    - "per_level_accuracy"
+    - "exploitability"
+    - "nash_approximation"
+    - "influence_correlation"
+  
+  # Analysis
+  save_predictions: true
+  visualize_attention: true
+  compute_shap: false
+  
+  # Generalization tests
+  test_cross_industry: true
+  test_cross_size: true
+  test_cross_culture: true
+
+# Experiment configuration
+experiment:
+  name: "baseline_h_posg"
+  seed: 42
+  device: "cuda"
+  
+  # Logging
+  log_interval: 10
+  eval_interval: 100
+  save_interval: 5
+  
+  # Directories
+  checkpoint_dir: "results/checkpoints"
+  log_dir: "results/logs"
+  figure_dir: "results/figures"
+  
+  # Tracking
+  use_tensorboard: true
+  use_wandb: false
+  wandb_project: "echo-i"
+  wandb_entity: null
+
+# Hypothesis testing configuration
+hypotheses:
+  H1_hierarchical_cascades: true
+  H2_centralization_consensus: true
+  H3_culture_alignment: true
+  H4_power_moderation: true
+
+
